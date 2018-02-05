@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.springframework.org/schema/beans"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+  <context:annotation-config/>
+
+  <bean class="com.dd.promotions.promotionengineservices.promotionengine.impl.DDPromotionEngineServiceImpl" id="customPromotionEngineService"
+    parent="defaultPromotionEngineService"/>
+
+  <bean depends-on="raoProviders" id="productPromotionalPriceRaoProvidersMapping" parent="mapMergeDirective">
+    <property name="key" value="PRODUCT_PROMOTION_PRICE"/>
+    <property name="value" ref="promotionalPriceCartRAOProviders"/>
+  </bean>
+
+
+  <util:map id="promotionalPriceCartRAOProviders">
+    <entry key="de.hybris.platform.commercefacades.product.data.ProductData">
+      <util:list>
+        <ref bean="promotionalPriceCartRAOProvider"/>
+        <ref bean="customerSupportRAOProvider"/>
+        <ref bean="campaignRaoProvider"/>
+      </util:list>
+    </entry>
+    <entry key="de.hybris.platform.promotions.model.PromotionGroupModel">
+      <util:list>
+        <ref bean="websiteGroupRaoProvider"/>
+      </util:list>
+    </entry>
+    <entry key="java.util.Date">
+      <util:list>
+        <ref bean="promotionEvaluationTimeRRDProvider"/>
+      </util:list>
+    </entry>
+  </util:map>
+
+  <bean class="com.dd.promotions.promotionengineservices.rao.providers.impl.PromotionalPriceCartRAOProvider" id="promotionalPriceCartRAOProvider">
+    <property name="factExtractorList" ref="promotionalPriceCartRAOProviderExtractors"/>
+  </bean>
+
+
+  <util:list id="promotionalPriceCartRAOProviderExtractors"/>
+
+  <bean id="promotionalPriceCartRAOConverter" parent="abstractPopulatingConverter">
+    <property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.CartRAO"/>
+    <property name="populators">
+      <list>
+        <ref bean="promotionalPriceCartRaoPopulator"/>
+      </list>
+    </property>
+  </bean>
+
+
+  <bean class="com.dd.promotions.promotionengineservices.converter.populator.PromotionalPriceCartRaoPopulator"
+    id="promotionalPriceCartRaoPopulator"/>
+</beans>
